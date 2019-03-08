@@ -1,15 +1,15 @@
 # Galatians 2:20 (KJV): I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.
 # verse = "χριστω συνεσταυρωμαι ζω δε ουκετι εγω ζη δε εν εμοι χριστος ο δε νυν ζω εν σαρκι εν πιστει ζω τη του υιου του θεου του αγαπησαντος με και παραδοντος εαυτον υπερ εμου"
 # BibleCode.decode_all(verse)
-# BibleCode.new(verse, 'KHAN', :numeric_value, false, word_stat: true).break
-# BibleCode.new(verse, 'KHAN', :numeric_value, true, word_stat: true).decode
+# BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true).break
+# BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: true,  word_stat: true).decode
 # sum = 19061
 # sum/7.0 => 2723.0
 # 2+7+2+3 => 14 => 7*2
 class BibleCode
   require 'prime'
 
-  attr_reader :passage, :map, :mapping, :value
+  attr_reader :verse, :author, :map, :value
 
   KHAN_MAP = {
     ' ' => { place_value:  0, numeric_value:   0, value:   0 },
@@ -71,26 +71,26 @@ class BibleCode
     'ω' => { place_value: 24, numeric_value: 800, value: 824 }
   }
 
-  def initialize(passage, mapping = 'KHAN', value = :numeric_value, verbose = false, word_stat: true)
-    @passage = passage
-    @mapping = mapping
-    @map = mapping == 'KHAN' ? KHAN_MAP : PANIN_MAP
+  def initialize(verse:, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true)
+    @verse = verse
+    @author = author
+    @map = author == 'KHAN' ? KHAN_MAP : PANIN_MAP
     @value = value
     @verbose = verbose
     @word_stat = word_stat
   end
 
   def self.decode_all(verse)
-    BibleCode.new(verse, 'KHAN', :place_value, false, word_stat: true).decode
-    BibleCode.new(verse, 'KHAN', :numeric_value, false, word_stat: false).decode
-    BibleCode.new(verse, 'KHAN', :value, false, word_stat: false).decode
-    BibleCode.new(verse, 'PANIN', :place_value, false, word_stat: false).decode
-    BibleCode.new(verse, 'PANIN', :numeric_value, false, word_stat: false).decode
-    BibleCode.new(verse, 'PANIN', :value, false, word_stat: false).decode
+    BibleCode.new(verse: verse, author: 'KHAN',  value: :place_value,   verbose: false, word_stat: true).decode
+    BibleCode.new(verse: verse, author: 'KHAN',  value: :numeric_value, verbose: false, word_stat: false).decode
+    BibleCode.new(verse: verse, author: 'KHAN',  value: :value,         verbose: false, word_stat: false).decode
+    BibleCode.new(verse: verse, author: 'PANIN', value: :place_value,   verbose: false, word_stat: false).decode
+    BibleCode.new(verse: verse, author: 'PANIN', value: :numeric_value, verbose: false, word_stat: false).decode
+    BibleCode.new(verse: verse, author: 'PANIN', value: :value,         verbose: false, word_stat: false).decode
   end
 
   def words
-    @words ||= passage.split(' ')
+    @words ||= verse.split(' ')
   end
 
   def word_count
@@ -100,13 +100,13 @@ class BibleCode
   def decode
     if @verbose
       words.each do |word|
-        wc = BibleCode.new(word, map, value)
+        wc = BibleCode.new(verse: word, author: author, value: value)
         printf "%20s %-80s %6s %s\n", word, *wc.decode_word
       end
       puts "-"*200
     end
     puts "words: #{word_count} words primes: #{Prime.prime_division(word_count)}" if @word_stat
-    printf "%-5s %15s sum: %7d primes: #{primes}\n", mapping, value, sum
+    printf "%-5s %-15s sum: %7d primes: #{primes}\n", author, value, sum
   end
 
   def decode_word
@@ -116,8 +116,8 @@ class BibleCode
   def break
     1.upto(word_count).each do |i|
       v = words[0..-i].join(' ')
-      code = BibleCode.new(v, map, value)
-      printf "%7d %40s #{v}\n", code.sum, code.primes
+      code = BibleCode.new(verse: v, author: author, value: value)
+      printf "%7d %50s #{v}\n", code.sum, code.primes
     end
   end
 
@@ -126,7 +126,7 @@ class BibleCode
   end
 
   def numbers
-    passage.chars.map { |l| map[l][value] }
+    verse.chars.map { |l| map[l][value] }
   end
 
   def primes
