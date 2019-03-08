@@ -1,14 +1,13 @@
 # Galatians 2:20 (KJV): I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.
 # verse = "χριστω συνεσταυρωμαι ζω δε ουκετι εγω ζη δε εν εμοι χριστος ο δε νυν ζω εν σαρκι εν πιστει ζω τη του υιου του θεου του αγαπησαντος με και παραδοντος εαυτον υπερ εμου"
-# code = BibleCode.new(verse, 'KHAN', :numeric_value)
-# code.decode
+# BibleCode.decode_all(verse)
 # sum = 19061
 # sum/7.0 => 2723.0
 # 2+7+2+3 => 14 => 7*2
 class BibleCode
   require 'prime'
 
-  attr_reader :passage, :mapping, :value
+  attr_reader :passage, :map, :mapping, :value, :verbose
 
   KHAN_MAP = {
     ' ' => { place_value:  0, numeric_value:   0, value:   0 },
@@ -70,10 +69,21 @@ class BibleCode
     'ω' => { place_value: 24, numeric_value: 800, value: 824 }
   }
 
-  def initialize(passage, mapping = 'KHAN', value = :numeric_value)
+  def initialize(passage, mapping = 'KHAN', value = :numeric_value, verbose = false)
     @passage = passage
-    @mapping = mapping == 'KHAN' ? KHAN_MAP : PANIN_MAP
+    @mapping = mapping
+    @map = mapping == 'KHAN' ? KHAN_MAP : PANIN_MAP
     @value = value
+    @verbose = verbose
+  end
+
+  def self.decode_all(verse)
+    BibleCode.new(verse, 'KHAN', :place_value, false).decode
+    BibleCode.new(verse, 'KHAN', :numeric_value, false).decode
+    BibleCode.new(verse, 'KHAN', :value, false).decode
+    BibleCode.new(verse, 'PANIN', :place_value, false).decode
+    BibleCode.new(verse, 'PANIN', :numeric_value, false).decode
+    BibleCode.new(verse, 'PANIN', :value, false).decode
   end
 
   def words
@@ -85,12 +95,14 @@ class BibleCode
   end
 
   def decode
-    words.each do |word|
-      wc = BibleCode.new(word, mapping, value)
-      printf "%20s %-80s %6s %s\n", word, *wc.decode_word
+    if verbose
+      words.each do |word|
+        wc = BibleCode.new(word, map, value)
+        printf "%20s %-80s %6s %s\n", word, *wc.decode_word
+      end
+      puts "-"*200
     end
-    puts "-"*200
-    puts "words: #{word_count} words primes: #{primes}"
+    puts "words: #{word_count} words primes: #{Prime.prime_division(word_count)}"
     puts "#{mapping} #{value} sum: #{sum} sum primes: #{primes}"
   end
 
@@ -110,7 +122,7 @@ class BibleCode
   end
 
   def numbers
-    passage.chars.map { |l| mapping[l][value] }
+    passage.chars.map { |l| map[l][value] }
   end
 
   def primes
