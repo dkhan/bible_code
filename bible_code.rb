@@ -7,7 +7,7 @@
 class BibleCode
   require 'prime'
 
-  attr_reader :passage, :map, :mapping, :value, :verbose
+  attr_reader :passage, :map, :mapping, :value
 
   KHAN_MAP = {
     ' ' => { place_value:  0, numeric_value:   0, value:   0 },
@@ -69,21 +69,22 @@ class BibleCode
     'ω' => { place_value: 24, numeric_value: 800, value: 824 }
   }
 
-  def initialize(passage, mapping = 'KHAN', value = :numeric_value, verbose = false)
+  def initialize(passage, mapping = 'KHAN', value = :numeric_value, verbose = false, word_stat: true)
     @passage = passage
     @mapping = mapping
     @map = mapping == 'KHAN' ? KHAN_MAP : PANIN_MAP
     @value = value
     @verbose = verbose
+    @word_stat = word_stat
   end
 
   def self.decode_all(verse)
-    BibleCode.new(verse, 'KHAN', :place_value, false).decode
-    BibleCode.new(verse, 'KHAN', :numeric_value, false).decode
-    BibleCode.new(verse, 'KHAN', :value, false).decode
-    BibleCode.new(verse, 'PANIN', :place_value, false).decode
-    BibleCode.new(verse, 'PANIN', :numeric_value, false).decode
-    BibleCode.new(verse, 'PANIN', :value, false).decode
+    BibleCode.new(verse, 'KHAN', :place_value, false, word_stat: true).decode
+    BibleCode.new(verse, 'KHAN', :numeric_value, false, word_stat: false).decode
+    BibleCode.new(verse, 'KHAN', :value, false, word_stat: false).decode
+    BibleCode.new(verse, 'PANIN', :place_value, false, word_stat: false).decode
+    BibleCode.new(verse, 'PANIN', :numeric_value, false, word_stat: false).decode
+    BibleCode.new(verse, 'PANIN', :value, false, word_stat: false).decode
   end
 
   def words
@@ -95,15 +96,15 @@ class BibleCode
   end
 
   def decode
-    if verbose
+    if @verbose
       words.each do |word|
         wc = BibleCode.new(word, map, value)
         printf "%20s %-80s %6s %s\n", word, *wc.decode_word
       end
       puts "-"*200
     end
-    puts "words: #{word_count} words primes: #{Prime.prime_division(word_count)}"
-    puts "#{mapping} #{value} sum: #{sum} sum primes: #{primes}"
+    puts "words: #{word_count} words primes: #{Prime.prime_division(word_count)}" if @word_stat
+    printf "%-5s %-15s sum: %7d primes: #{primes}\n", mapping, value, sum
   end
 
   def decode_word
