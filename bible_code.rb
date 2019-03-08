@@ -1,6 +1,8 @@
 # Galatians 2:20 (KJV): I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.
 # verse = "χριστω συνεσταυρωμαι ζω δε ουκετι εγω ζη δε εν εμοι χριστος ο δε νυν ζω εν σαρκι εν πιστει ζω τη του υιου του θεου του αγαπησαντος με και παραδοντος εαυτον υπερ εμου"
 # BibleCode.decode_all(verse)
+# BibleCode.new(verse, 'KHAN', :numeric_value, false, word_stat: true).break
+# BibleCode.new(verse, 'KHAN', :numeric_value, true, word_stat: true).decode
 # sum = 19061
 # sum/7.0 => 2723.0
 # 2+7+2+3 => 14 => 7*2
@@ -104,7 +106,7 @@ class BibleCode
       puts "-"*200
     end
     puts "words: #{word_count} words primes: #{Prime.prime_division(word_count)}" if @word_stat
-    printf "%-5s %-15s sum: %7d primes: #{primes}\n", mapping, value, sum
+    printf "%-5s %15s sum: %7d primes: #{primes}\n", mapping, value, sum
   end
 
   def decode_word
@@ -112,9 +114,10 @@ class BibleCode
   end
 
   def break
-    1.upto(words(verse).length).each do |i|
-      v = words(verse)[0..-i].join(' ')
-      puts "#{sum(v)} #{primes(v)} #{v}"
+    1.upto(word_count).each do |i|
+      v = words[0..-i].join(' ')
+      code = BibleCode.new(v, map, value)
+      printf "%7d %40s #{v}\n", code.sum, code.primes
     end
   end
 
