@@ -1,8 +1,10 @@
 # Galatians 2:20 (KJV): I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.
 # verse = "χριστω συνεσταυρωμαι ζω δε ουκετι εγω ζη δε εν εμοι χριστος ο δε νυν ζω εν σαρκι εν πιστει ζω τη του υιου του θεου του αγαπησαντος με και παραδοντος εαυτον υπερ εμου"
 # BibleCode.decode_all(verse)
-# BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true).break
-# BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: true,  word_stat: true).decode
+# code = BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true)
+# code.break
+# code.decode
+# code.unique_word_count
 # sum = 19061
 # sum/7.0 => 2723.0
 # 2+7+2+3 => 14 => 7*2
@@ -131,5 +133,22 @@ class BibleCode
 
   def primes
     Prime.prime_division(sum)
+  end
+
+  def unique_words
+    return @unique_words if @unique_words
+    @unique_words = {}
+    words.each do |word|
+      if @unique_words[word]
+        @unique_words[word] += 1
+      else
+        @unique_words[word] = 1
+      end
+    end
+    @unique_words
+  end
+
+  def unique_word_count
+    unique_words.keys.count
   end
 end
