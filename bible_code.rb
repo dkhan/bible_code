@@ -1,10 +1,11 @@
 # Galatians 2:20 (KJV): I am crucified with Christ: nevertheless I live; yet not I, but Christ liveth in me: and the life which I now live in the flesh I live by the faith of the Son of God, who loved me, and gave himself for me.
 # verse = "χριστω συνεσταυρωμαι ζω δε ουκετι εγω ζη δε εν εμοι χριστος ο δε νυν ζω εν σαρκι εν πιστει ζω τη του υιου του θεου του αγαπησαντος με και παραδοντος εαυτον υπερ εμου"
 # BibleCode.decode_all(verse)
-# code = BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true)
+# code = BibleCode.new(verse: verse, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true); pp code.vocabulary;1
 # code.break
 # code.decode
 # code.unique_word_count
+# code.translate
 # sum = 19061
 # sum/7.0 => 2723.0
 # 2+7+2+3 => 14 => 7*2
@@ -73,6 +74,16 @@ class BibleCode
     'ω' => { place_value: 24, numeric_value: 800, value: 824 }
   }
 
+  WORD_FORMS = {
+    "του" => %w(τον της τους),
+    "εζεκιας" => %w(εζεκιαν),
+    "ιουδας" => %w(ιουδαν),
+    "ιωσιας" => %w(ιωσιαν),
+    "μανασσης" => %w(μανασση),
+    "οζιας" => %w(οζιαν),
+    "σολομων" => %w(σολομωνα),
+  }
+
   def initialize(verse:, author: 'KHAN', value: :numeric_value, verbose: false, word_stat: true)
     @verse = verse
     @author = author
@@ -137,6 +148,7 @@ class BibleCode
 
   def unique_words
     return @unique_words if @unique_words
+
     @unique_words = {}
     words.each do |word|
       if @unique_words[word]
@@ -150,5 +162,52 @@ class BibleCode
 
   def unique_word_count
     unique_words.keys.count
+  end
+
+  def vocabulary
+    @vocabulary ||= unique_words.keys.map do |word|
+      vw = word
+      WORD_FORMS.each do |w, f|
+        if w == word || f.include?(word)
+          vw = w; break
+        end
+      end
+      vw
+    end.sort.uniq
+  end
+
+  def vocabulary_count
+    vocabulary.count
+  end
+
+  def translate
+    words.each do |word|
+      printf "%40s %40s\n", word, Translator.translate(word, 'el-GR', 'en')
+    end
+    nil
+  end
+end
+
+class Translator
+  require 'net/http'
+  require 'rubygems'
+  require "uri"
+  require 'json'
+
+  def self.translate(text, from = 'el-GR', to = 'en')
+    uri = URI.parse("http://mymemory.translated.net/api/get")
+
+    response = Net::HTTP.post_form(uri, { "q" => text,"langpair" => "#{from.downcase}|#{to.downcase}", "per_page" => "50" })
+
+    json_response_body = JSON.parse response.body
+
+    if json_response_body['responseStatus'] == 200
+      json_response_body['responseData']['translatedText']
+    else
+      "<#{text}>"
+      # puts json_response_body['responseDetails']
+    end
+  rescue
+    "<#{text}>"
   end
 end
