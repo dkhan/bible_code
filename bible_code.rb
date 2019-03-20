@@ -102,8 +102,32 @@ class BibleCode
     BibleCode.new(verse: verse, author: 'PANIN', value: :value,         verbose: false, word_stat: false).decode
   end
 
+  def analyze
+    puts "The number of words: #{word_count} => #{Prime.prime_division(word_count)}"
+    puts "The number of letters: "
+    puts "The number of vowels: "
+    puts "The number of consonants: "
+    puts "The number of words that begin with a vowel: "
+    puts "The number of words that begin with a consonant: "
+    puts "The number of words that occur more than once: "
+    puts "The number of words that occur in more than one form: "
+    puts "The number of words that occur only in one form: "
+    puts "The number of nouns: "
+    puts "The number of names: "
+    puts "The number of male names: "
+    puts "The number of generations: "
+  end
+
   def words
     @words ||= verse.split(' ')
+  end
+
+  def letters
+    @letters ||= verse.gsub(' ', '').chars
+  end
+
+  def letter_count
+    letters.count
   end
 
   def word_count
