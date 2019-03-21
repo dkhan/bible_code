@@ -116,22 +116,22 @@ class BibleCode
   end
 
   def analyze
-    printf "The number of words:                                             %7d %50s\n", word_count,                          Prime.prime_division(word_count)
-    printf "The number of letters:                                           %7d %50s\n", letter_count,                        Prime.prime_division(letter_count)
-    printf "The number of vowels:                                            %7d %50s\n", vowel_count,                         Prime.prime_division(vowel_count)
-    printf "The number of consonants:                                        %7d %50s\n", consonant_count,                     Prime.prime_division(consonant_count)
-    printf "The number of words that begin with a vowel:                     %7d %50s\n", vowel_word_count,                    Prime.prime_division(vowel_word_count)
-    printf "The number of words that begin with a consonant:                 %7d %50s\n", consonant_word_count,                Prime.prime_division(consonant_word_count)
-    printf "The number of words that occur more than once:                   %7d %50s\n", words_more_than_once_count,          Prime.prime_division(words_more_than_once_count)
-    printf "The number of vocabulary words:                                  %7d %50s\n", vocabulary_count,                    Prime.prime_division(vocabulary_count)
-    printf "The number of vocabulary letters:                                %7d %50s\n", vocabulary_letter_count,             Prime.prime_division(vocabulary_letter_count)
-    printf "The number of vocabulary vowels:                                 %7d %50s\n", vocabulary_vowel_count,              Prime.prime_division(vocabulary_vowel_count)
-    printf "The number of vocabulary consonants:                             %7d %50s\n", vocabulary_consonant_count,          Prime.prime_division(vocabulary_consonant_count)
-    printf "The number of vocabulary words that begin with a vowel:          %7d %50s\n", vocabulary_vowel_word_count,         Prime.prime_division(vocabulary_vowel_word_count)
-    printf "The number of vocabulary words that begin with a consonant:      %7d %50s\n", vocabulary_consonant_word_count,     Prime.prime_division(vocabulary_consonant_word_count)
-    printf "The number of vocabulary words that occur more than once:        %7d %50s\n", vocabulary_more_than_once_count,     Prime.prime_division(vocabulary_more_than_once_count)
-    printf "The number of vocabulary words that occur in more than one form: %7d %50s\n", vocabulary_more_than_one_form_count, Prime.prime_division(vocabulary_more_than_one_form_count)
-    printf "The number of vocabulary words that occur only in one form:      %7d %50s\n", vocabulary_only_in_one_form_count,   Prime.prime_division(vocabulary_only_in_one_form_count)
+    printf "The number of words:                                             %7d %50s\n", word_count,                          primes(word_count)
+    printf "The number of letters:                                           %7d %50s\n", letter_count,                        primes(letter_count)
+    printf "The number of vowels:                                            %7d %50s\n", vowel_count,                         primes(vowel_count)
+    printf "The number of consonants:                                        %7d %50s\n", consonant_count,                     primes(consonant_count)
+    printf "The number of words that begin with a vowel:                     %7d %50s\n", vowel_word_count,                    primes(vowel_word_count)
+    printf "The number of words that begin with a consonant:                 %7d %50s\n", consonant_word_count,                primes(consonant_word_count)
+    printf "The number of words that occur more than once:                   %7d %50s\n", words_more_than_once_count,          primes(words_more_than_once_count)
+    printf "The number of vocabulary words:                                  %7d %50s\n", vocabulary_count,                    primes(vocabulary_count)
+    printf "The number of vocabulary letters:                                %7d %50s\n", vocabulary_letter_count,             primes(vocabulary_letter_count)
+    printf "The number of vocabulary vowels:                                 %7d %50s\n", vocabulary_vowel_count,              primes(vocabulary_vowel_count)
+    printf "The number of vocabulary consonants:                             %7d %50s\n", vocabulary_consonant_count,          primes(vocabulary_consonant_count)
+    printf "The number of vocabulary words that begin with a vowel:          %7d %50s\n", vocabulary_vowel_word_count,         primes(vocabulary_vowel_word_count)
+    printf "The number of vocabulary words that begin with a consonant:      %7d %50s\n", vocabulary_consonant_word_count,     primes(vocabulary_consonant_word_count)
+    printf "The number of vocabulary words that occur more than once:        %7d %50s\n", vocabulary_more_than_once_count,     primes(vocabulary_more_than_once_count)
+    printf "The number of vocabulary words that occur in more than one form: %7d %50s\n", vocabulary_more_than_one_form_count, primes(vocabulary_more_than_one_form_count)
+    printf "The number of vocabulary words that occur only in one form:      %7d %50s\n", vocabulary_only_in_one_form_count,   primes(vocabulary_only_in_one_form_count)
   end
 
   def words
@@ -202,8 +202,9 @@ class BibleCode
     verse.chars.map { |l| map[l][value] }
   end
 
-  def primes
-    Prime.prime_division(sum)
+  def primes(num = sum)
+    return [] if num == 0
+    Prime.prime_division(num)
   end
 
   def unique_words
